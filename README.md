@@ -16,6 +16,8 @@ This is a useful resource for pipeline development time, while a required artifa
 
 * `skip_ssl_verification`: *Optional.* Skips ssl verification if defined as `true`. Default is `false`.
 
+* `unpack`: *Optional.* Unpacks the file (if a support file type) if defined as `true`. Default is `false`.
+
 ### Example
 
 Resource configuration:
