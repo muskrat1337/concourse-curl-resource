@@ -25,6 +25,7 @@ filename=$(jq -r '.source.filename // ""' < $payload)
 skip_ssl_verification=$(jq -r '.source.skip_ssl_verification // ""' < $payload)
 username=$(jq -r '.source.username // ""' < $payload)
 password=$(jq -r '.source.password // ""' < $payload)
+unpack=$(jq -r '.source.unpack // ""' < $payload)
 
 if [ -z "$url" ]; then
   echo "invalid payload (missing url)"
@@ -54,5 +55,28 @@ if [ -z "$version" ]; then
 fi
 
 curl "-L" $args_security "$args_url" "-o" "$filename"
+
+if [[ "${unpack}" == "true" ]]; then
+    if [[ "${filename}" =~ tar\.gz|\.tgz ]]; then
+        echo "unpacking ${filename}"
+        tar -zxf ${filename}
+        rm -f ${filename}
+    elif [[ "${filename}" =~ \.gz ]]; then
+        echo "unpacking ${filename}"
+        gunzip ${filename}
+        rm -f ${filename}
+    elif [[ "${filename}" =~ \.zip ]]; then
+        echo "unpacking ${filename}"
+        unzip ${filename}
+        rm -f ${filename}
+    elif [[ "${filename}" =~ \.tar ]]; then
+        echo "unpacking ${filename}"
+        tar -xf ${filename}
+        rm -f ${filename}
+    else
+       echo "unpack called and a supported file type not found"
+       exit 1
+    fi
+fi
 
 jq -n "{ version: {version: $(echo $version | jq .[].version )}}" >&3
